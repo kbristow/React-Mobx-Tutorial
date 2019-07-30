@@ -1,10 +1,30 @@
 import * as React from "react";
+import {inject, observer} from "mobx-react";
+import {StateStores} from "../../stores";
+import {TodoStore} from "../../stores/TodoStore";
 
-class AddTodo extends React.Component<AddTodoProps> {
+export interface AddTodoBaseProps {
+}
+
+interface AddTodoProps extends AddTodoBaseProps {
+    todoStore: TodoStore;
+}
+
+@inject((stores: StateStores) => {
+    return {
+        todoStore: stores.todoStore,
+    }
+})
+@observer
+class AddTodo extends React.Component<AddTodoBaseProps> {
 
     public state = {
         title: "",
     };
+
+    get injected() {
+        return this.props as AddTodoProps;
+    }
 
     public render(): React.ReactNode {
         return (
@@ -20,15 +40,12 @@ class AddTodo extends React.Component<AddTodoProps> {
         this.setState({[event.target.name]: event.target.value});
     };
 
-    private onSubmit = (event: React.ChangeEvent<HTMLFormElement>) => {
+    private onSubmit = async (event: React.ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
-        this.props.addTodo(this.state.title);
+        await this.injected.todoStore.addTodo(this.state.title);
         this.setState({title: ""});
     }
 }
 
-interface AddTodoProps {
-    addTodo: (todoTitle: string) => void;
-}
 
 export default AddTodo;

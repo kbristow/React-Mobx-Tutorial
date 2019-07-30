@@ -1,4 +1,5 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Followed the tutorial here: https://youtu.be/sBws8MSXN7A but did the implementation in TypeScript and used MobX for 
+state management.
 
 ## Available Scripts
 

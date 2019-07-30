@@ -1,14 +1,38 @@
 import React, {CSSProperties} from 'react';
+import {inject, observer} from "mobx-react";
+import {StateStores} from "../../stores";
+import {TodoStore} from "../../stores/TodoStore";
 
-class TodoItem extends React.Component<TodoItemProps> {
+interface TodoItemBaseProps {
+    todo: Todo;
+}
+
+interface TodoItemProps extends TodoItemBaseProps {
+    todoStore: TodoStore;
+    markComplete: (id: string) => void;
+    delTodo: (id: string) => void;
+}
+
+@inject((stores: StateStores) => {
+    return {
+        todoStore: stores.todoStore,
+    }
+})
+@observer
+class TodoItem extends React.Component<TodoItemBaseProps> {
+
+    get injected() {
+        return this.props as TodoItemProps;
+    }
+
     public render(): React.ReactNode {
-        const {id, title} = this.props.todo;
+        const {id, title} = this.injected.todo;
         return (
             <div style={this.getStyle()}>
                 <p>
-                    <input type="checkbox" onChange={this.props.markComplete.bind(this, id)}/>{' '}
+                    <input type="checkbox" checked={this.injected.todo.completed} onChange={this.injected.todoStore.markComplete.bind(this, id)}/>{' '}
                     {title}
-                    <button style={btnStyle} onClick={this.props.delTodo.bind(this, id)}>X</button>
+                    <button style={btnStyle} onClick={this.injected.todoStore.delTodo.bind(this, id)}>X</button>
                 </p>
 
             </div>);
@@ -24,11 +48,6 @@ class TodoItem extends React.Component<TodoItemProps> {
     };
 }
 
-interface TodoItemProps {
-    todo: Todo;
-    markComplete: (id: string) => void;
-    delTodo: (id: string) => void;
-}
 
 export interface Todo {
     id: string,

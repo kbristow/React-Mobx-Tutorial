@@ -1,18 +1,34 @@
 import React from 'react';
-import TodoItem, {Todo} from "./TodoItem";
+import TodoItem from "./TodoItem";
+import {TodoStore} from "../../stores/TodoStore";
+import {inject, observer} from "mobx-react";
+import {StateStores} from "../../stores";
 
-class Todos extends React.Component<TodosProps> {
-    public render(): React.ReactNode {
-        return this.props.todos.map(todo => (
-            <TodoItem key={todo.id} todo={todo} markComplete={this.props.markComplete} delTodo={this.props.delTodo}/>
-        ));
-    }
+
+interface TodosBaseProps {
 }
 
 interface TodosProps {
-    todos: Todo[];
-    markComplete: (id: string) => void;
-    delTodo: (id: string) => void;
+    todoStore: TodoStore;
+}
+
+@inject((stores: StateStores) => {
+    return {
+        todoStore: stores.todoStore,
+    }
+})
+@observer
+class Todos extends React.Component<TodosBaseProps> {
+
+    get injected() {
+        return this.props as TodosProps;
+    }
+
+    public render(): React.ReactNode {
+        return this.injected.todoStore.todos.map(todo => (
+            <TodoItem key={todo.id} todo={todo}/>
+        ));
+    }
 }
 
 export default Todos;
